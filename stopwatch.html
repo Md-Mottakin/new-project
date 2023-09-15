@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  #stopwatch {
+    font-size: 24px;
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+  <div id="stopwatch">00:00:00</div>
+  <button id="leftButton">Lap</button>
+  <button id="rightButton">Start</button>
+
+<script>
+  let timerInterval;
+  let running = false;
+  let startTime = 0;
+  let lapCount = 1;
+
+  const stopwatchDisplay = document.getElementById('stopwatch');
+  const leftButton = document.getElementById('leftButton');
+  const rightButton = document.getElementById('rightButton');
+
+  function updateStopwatch() {
+    const currentTime = Date.now() - startTime;
+    const hours = Math.floor(currentTime / 3600000);
+    const minutes = Math.floor((currentTime % 3600000) / 60000);
+    const seconds = Math.floor((currentTime % 60000) / 1000);
+
+    stopwatchDisplay.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function startTimer() {
+    startTime = Date.now() - (lapCount === 1 ? 0 : startTime);
+    running = true;
+    timerInterval = setInterval(updateStopwatch, 1000);
+    leftButton.textContent = 'Lap';
+    rightButton.textContent = 'Stop';
+  }
+
+  function stopTimer() {
+    running = false;
+    clearInterval(timerInterval);
+    leftButton.textContent = 'Reset';
+    rightButton.textContent = 'Resume';
+  }
+
+  function resetTimer() {
+    clearInterval(timerInterval);
+    stopwatchDisplay.textContent = '00:00:00';
+    startTime = 0;
+    running = false;
+    lapCount = 1;
+    leftButton.textContent = 'Lap';
+    rightButton.textContent = 'Start';
+  }
+
+  leftButton.addEventListener('click', function () {
+    if (running) {
+      const lapTime = stopwatchDisplay.textContent;
+      const lapItem = document.createElement('p');
+      lapItem.textContent = `Lap ${lapCount}: ${lapTime}`;
+      document.body.appendChild(lapItem);
+      lapCount++;
+    } else if (leftButton.textContent === 'Reset') {
+      resetTimer();
+    }
+  });
+
+  rightButton.addEventListener('click', function () {
+    if (running) {
+      stopTimer();
+    } else if (rightButton.textContent === 'Resume') {
+      startTimer();
+    } else {
+      startTimer();
+    }
+  });
+</script>
+</body>
+</html>
